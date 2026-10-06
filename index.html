@@ -30,6 +30,7 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 @media(min-width:621px){.app{box-shadow:0 0 70px #0006}.coins{grid-template-columns:repeat(4,1fr)}}
 
 .wallet-modal-form{display:grid;gap:10px}
+.activeTrades{display:grid;gap:10px;margin-top:14px}.activeTrade{padding:14px;border:1px solid #28334a;border-radius:18px;background:linear-gradient(145deg,#111a2a,#0b111b);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.activeTradeTop{display:flex;align-items:center;gap:9px}.miniIcon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#172033;border:1px solid #2b3850;font-weight:900}.tradeName{font-weight:900}.tradeSub{font-size:10px;color:var(--muted);margin-top:3px}.timer{font-size:22px;font-weight:950;color:#64cfff;min-width:55px;text-align:right}.timer.done{color:var(--green)}
 </style>
 </head>
 <body>
@@ -46,6 +47,7 @@ main{padding:15px}.view{display:none}.view.active{display:block}
  <div class="slots" id="slots"></div><div class="payout"><span class="muted">Potential payout</span><strong id="payout">₹1,100.00</strong></div>
  <div class="notice">Prototype interface — no real-money transactions are connected.</div>
  <button class="primary" id="start">Start Trade · 30s</button></section>
+ <section class="head"><div><div class="label">ACTIVE</div><h2>Running Trades</h2><p class="muted">Each active trade settles automatically after 30 seconds.</p></div></section><section class="activeTrades" id="activeTrades"><div class="empty" style="border:1px solid var(--line);border-radius:18px;background:#0f1420">No active trades.</div></section>
  <section class="head"><div><div class="label">ACTIVITY</div><h2>Recent Trades</h2></div></section><section class="history" id="homeHistory"><div class="empty">No trades yet.</div></section>
 </section>
 
@@ -84,7 +86,7 @@ const COINS = [
   {id:"ada",name:"Cardano",ticker:"ADA",icon:"A",price:0.62,change:1.42}
 ];
 
-const STORAGE_KEY = "cryptox_state_v5";
+const STORAGE_KEY = "cryptox_state_v7";
 const START_BALANCE = 10000;
 const FIXED_RATE = 10;
 const DURATION_MS = 30000;
@@ -93,6 +95,7 @@ let state = loadState();
 let selectedId = state.selectedId || "btc";
 let tickTimer = null;
 let activeModalTrade = null;
+let winQueue = [];
 
 const $ = s => document.querySelector(s);
 const money = n => "₹" + Number(n || 0).toLocaleString("en-IN", {
@@ -120,12 +123,11 @@ function saveState(){
 }
 
 function updateBalances(){
-  $("#balance").textContent = money(state.balance);
-  $("#walletBalance").textContent = money(state.balance);
-  $("#topBalance").textContent = money(state.balance);
-  $("#available").textContent = money(state.balance);
-  $("#pnl").textContent = money(state.pnl);
-  $("#walletProfit").textContent = money(state.pnl);
+  const balanceText = money(state.balance);
+  const ids = ["balance","walletBalance","topBalance"];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = balanceText; });
+  const pnl = document.getElementById("walletProfit");
+  if(pnl) pnl.textContent = money(state.pnl);
 }
 
 function renderCoins(){
@@ -172,6 +174,24 @@ function updatePayout(){
   $("#payout").textContent = money(amount * 1.10);
 }
 
+function renderActiveTrades(){
+  const box = document.getElementById("activeTrades");
+  if(!box) return;
+  const running = state.trades.filter(t => t.status === "Running").sort((a,b)=>a.endsAt-b.endsAt);
+  if(!running.length){
+    box.innerHTML = '<div class="empty" style="border:1px solid var(--line);border-radius:18px;background:#0f1420">No active trades.</div>';
+    return;
+  }
+  box.innerHTML = running.map(t => {
+    const c = COINS.find(x => x.id === t.coinId) || COINS[0];
+    const left = Math.max(0, t.endsAt - Date.now());
+    return `<div class="activeTrade" data-active="${t.id}">
+      <div><div class="activeTradeTop"><div class="miniIcon">${c.icon}</div><div><div class="tradeName">${c.name} <span class="ticker">${c.ticker}</span></div><div class="tradeSub">${money(t.amount)} · Fixed 10% · 30s</div></div></div></div>
+      <div class="timer" data-countdown="${t.id}">${Math.ceil(left/1000)}s</div>
+    </div>`;
+  }).join("");
+}
+
 function renderHistory(){
   const html = state.trades.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,50).map(t => {
     const c = COINS.find(x => x.id === t.coinId) || COINS[0];
@@ -198,9 +218,12 @@ function renderActiveCountdowns(){
   const now = Date.now();
   state.trades.filter(t => t.status === "Running").forEach(t => {
     const left = Math.max(0, t.endsAt - now);
-    const nodes = document.querySelectorAll(`[data-countdown="${t.id}"]`);
-    nodes.forEach(n => n.textContent = Math.ceil(left/1000) + "s");
+    document.querySelectorAll(`[data-countdown="${t.id}"]`).forEach(n => {
+      n.textContent = Math.ceil(left/1000) + "s";
+      n.classList.toggle("done", left <= 0);
+    });
   });
+  renderActiveTrades();
 }
 
 function finishTrade(t){
@@ -221,7 +244,7 @@ function finishTrade(t){
   renderSlots();
   renderHistory();
 
-  showWin(t);
+  queueWin(t);
 }
 
 function showWin(t){
@@ -232,11 +255,21 @@ function showWin(t){
   $("#winModal").classList.add("show");
 }
 
+function queueWin(t){
+  winQueue.push(t);
+  if(!document.getElementById("winModal").classList.contains("show")) showNextWin();
+}
+
+function showNextWin(){
+  if(!winQueue.length) return;
+  showWin(winQueue.shift());
+}
+
 function closeWin(){
   $("#winModal").classList.remove("show");
   activeModalTrade = null;
+  setTimeout(showNextWin, 80);
 }
-
 window.closeWin = closeWin;
 
 function processExpiredTrades(){
@@ -251,7 +284,7 @@ function startCountdownLoop(){
   tickTimer = setInterval(() => {
     processExpiredTrades();
     renderActiveCountdowns();
-  }, 250);
+  }, 500);
 }
 
 function startTrade(){
@@ -291,15 +324,58 @@ function startTrade(){
   updateBalances();
   renderSlots();
   renderHistory();
+  renderActiveTrades();
   renderActiveCountdowns();
 }
 
 function walletAction(type){
-  alert(type === "deposit"
-    ? "Deposit UI is ready for backend/payment integration."
-    : "Withdraw UI is ready for backend/payout integration.");
+  const modal = document.getElementById("walletModal");
+  const title = document.getElementById("walletModalTitle");
+  const body = document.getElementById("walletModalBody");
+  if(type === "deposit"){
+    title.textContent = "Deposit funds";
+    body.innerHTML = `<div class="wallet-modal-form">
+      <label>Amount<input id="depositAmount" type="number" min="10" placeholder="Enter amount"></label>
+      <label>Method<select id="depositMethod"><option>UPI</option><option>Bank Transfer</option><option>Crypto</option></select></label>
+      <button class="primary" onclick="submitDeposit()">Create Deposit Request</button>
+      <div class="notice">Prototype only — this creates a pending request and does not move real money.</div>
+    </div>`;
+  } else {
+    title.textContent = "Withdraw funds";
+    body.innerHTML = `<div class="wallet-modal-form">
+      <label>Account Holder Name<input id="holderName" placeholder="Name as per bank account"></label>
+      <label>Bank Name<input id="bankName" placeholder="Bank name"></label>
+      <label>Account Number<input id="accountNumber" inputmode="numeric" placeholder="Account number"></label>
+      <label>IFSC Code<input id="ifsc" placeholder="IFSC code"></label>
+      <label>Withdrawal Amount<input id="withdrawAmount" type="number" min="10" placeholder="Enter amount"></label>
+      <button class="primary" onclick="submitWithdrawal()">Create Withdrawal Request</button>
+      <div class="notice">Prototype only — this creates a pending request and does not send money to a bank.</div>
+    </div>`;
+  }
+  modal.classList.add("show");
 }
 
+function closeWalletModal(){ document.getElementById("walletModal").classList.remove("show"); }
+function submitDeposit(){
+  const amount = Number(document.getElementById("depositAmount")?.value || 0);
+  if(amount < 10){ alert("Enter a valid deposit amount."); return; }
+  alert(`Deposit request created for ${money(amount)}. No real funds were moved.`);
+  closeWalletModal();
+}
+function submitWithdrawal(){
+  const name = document.getElementById("holderName")?.value.trim();
+  const bank = document.getElementById("bankName")?.value.trim();
+  const acct = document.getElementById("accountNumber")?.value.trim();
+  const ifsc = document.getElementById("ifsc")?.value.trim();
+  const amount = Number(document.getElementById("withdrawAmount")?.value || 0);
+  if(!name || !bank || !acct || !ifsc || amount < 10){ alert("Please fill all bank details and a valid amount."); return; }
+  if(amount > state.balance){ alert("Insufficient available balance."); return; }
+  alert(`Withdrawal request created for ${money(amount)}. No real funds were moved.`);
+  closeWalletModal();
+}
+window.closeWalletModal=closeWalletModal;
+window.submitDeposit=submitDeposit;
+window.submitWithdrawal=submitWithdrawal;
 window.walletAction = walletAction;
 
 function copyCode(){
@@ -331,6 +407,7 @@ selectCoin(selectedId);
 updatePayout();
 updateBalances();
 renderHistory();
+renderActiveTrades();
 processExpiredTrades();
 renderActiveCountdowns();
 startCountdownLoop();
@@ -347,4 +424,4 @@ startCountdownLoop();
 </div>
 
 </body>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </html>
+                                       </html>
