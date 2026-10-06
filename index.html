@@ -28,6 +28,8 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 .bottom{position:fixed;left:0;right:0;bottom:0;height:72px;background:#0b0f18ee;border-top:1px solid #20283a;backdrop-filter:blur(18px);display:flex;justify-content:center;z-index:30}.nav{width:20%;max-width:125px;border:0;background:none;color:#778196;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}.nav b{font-size:21px}.nav span{font-size:10px;font-weight:800}.nav.active{color:#9a68ff}
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:25px;z-index:100;backdrop-filter:blur(8px)}.modal.show{display:flex}.winBox{width:min(390px,100%);padding:28px 22px;text-align:center;border:1px solid #7148d9;border-radius:28px;background:linear-gradient(145deg,#17122a,#0e1420);box-shadow:0 30px 100px #0009}.check{width:72px;height:72px;margin:auto;border-radius:50%;display:grid;place-items:center;background:#162d28;border:1px solid #29dd91;color:#29dd91;font-size:38px;box-shadow:0 0 35px #29dd9133}.winBox h2{font-size:27px;margin:17px 0 5px}.winAmount{font-size:30px;font-weight:950;color:#2be093}.winMeta{margin-top:7px;color:var(--muted);font-size:12px}.close{width:100%;margin-top:20px;padding:13px;border:0;border-radius:13px;color:white;font-weight:900;background:linear-gradient(90deg,#8050ff,#3d73ff)}
 @media(min-width:621px){.app{box-shadow:0 0 70px #0006}.coins{grid-template-columns:repeat(4,1fr)}}
+
+.wallet-modal-form{display:grid;gap:10px}
 </style>
 </head>
 <body>
@@ -42,7 +44,7 @@ main{padding:15px}.view{display:none}.view.active{display:block}
  <section class="panel"><div class="tradeTop"><div><div class="label">TRADE TICKET</div><div class="tradeTitle" id="coinName">Bitcoin <span style="color:#46caff;font-size:11px">BTC</span></div></div><div class="price" id="coinPrice">$67,240</div></div>
  <div class="fields"><label>Investment<input id="amount" type="number" min="10" value="1000"></label><label>Fixed Return<div style="margin-top:6px;padding:12px;border:1px solid #242e40;border-radius:12px;background:#0b1019;color:#fff;font-weight:850">10%</div></label></div>
  <div class="slots" id="slots"></div><div class="payout"><span class="muted">Potential payout</span><strong id="payout">₹1,100.00</strong></div>
- <div class="notice">Simulation interface — no real-money transactions are connected.</div>
+ <div class="notice">Prototype interface — no real-money transactions are connected.</div>
  <button class="primary" id="start">Start Trade · 30s</button></section>
  <section class="head"><div><div class="label">ACTIVITY</div><h2>Recent Trades</h2></div></section><section class="history" id="homeHistory"><div class="empty">No trades yet.</div></section>
 </section>
@@ -71,39 +73,278 @@ main{padding:15px}.view{display:none}.view.active{display:block}
 <div class="modal" id="winModal"><div class="winBox"><div class="check">✓</div><h2>Trade Won</h2><div class="winAmount" id="winAmount">+₹100.00</div><div class="winMeta" id="winMeta">Bitcoin · 30 seconds</div><button class="close" onclick="closeWin()">Continue</button></div></div>
 
 <script>
-const coins=[
-{id:"btc",name:"Bitcoin",ticker:"BTC",icon:"₿",price:67240.21,change:2.41},
-{id:"eth",name:"Ethereum",ticker:"ETH",icon:"Ξ",price:2481.36,change:1.87},
-{id:"ltc",name:"Litecoin",ticker:"LTC",icon:"Ł",price:97.42,change:-.62},
-{id:"xrp",name:"XRP",ticker:"XRP",icon:"X",price:2.91,change:3.12},
-{id:"sol",name:"Solana",ticker:"SOL",icon:"S",price:151.84,change:4.22},
-{id:"bnb",name:"BNB",ticker:"BNB",icon:"B",price:612.48,change:.91},
-{id:"doge",name:"Dogecoin",ticker:"DOGE",icon:"Ð",price:.18,change:-1.11},
-{id:"ada",name:"Cardano",ticker:"ADA",icon:"A",price:.62,change:1.42}
+const COINS = [
+  {id:"btc",name:"Bitcoin",ticker:"BTC",icon:"₿",price:67240.21,change:2.41},
+  {id:"eth",name:"Ethereum",ticker:"ETH",icon:"Ξ",price:2481.36,change:1.87},
+  {id:"ltc",name:"Litecoin",ticker:"LTC",icon:"Ł",price:97.42,change:-0.62},
+  {id:"xrp",name:"XRP",ticker:"XRP",icon:"X",price:2.91,change:3.12},
+  {id:"sol",name:"Solana",ticker:"SOL",icon:"S",price:151.84,change:4.22},
+  {id:"bnb",name:"BNB",ticker:"BNB",icon:"B",price:612.48,change:0.91},
+  {id:"doge",name:"Dogecoin",ticker:"Ð",price:0.18,change:-1.11},
+  {id:"ada",name:"Cardano",ticker:"ADA",icon:"A",price:0.62,change:1.42}
 ];
-let selected=coins[0],balance=10000,pnl=0,used={},trades=[];
-const $=s=>document.querySelector(s), money=x=>"₹"+Number(x).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-function updateBalances(){["#balance","#walletBalance"].forEach(s=>$(s).textContent=money(balance));$("#topBalance").textContent=money(balance);$("#available").textContent=money(balance);$("#pnl").textContent=money(pnl);$("#walletProfit").textContent=money(pnl)}
-function renderCoins(){let q=$("#search").value.toLowerCase();$("#coins").innerHTML=coins.filter(c=>(c.name+c.ticker).toLowerCase().includes(q)).map(c=>`<article class="coin" data-id="${c.id}"><div class="coinTop"><div class="icon">${c.icon}</div><div class="tag">30 SEC</div></div><div class="coinName">${c.name}</div><div class="ticker">${c.ticker}</div><div class="coinPrice">$${c.price.toLocaleString()}</div><div class="change ${c.change>=0?"green":""}">${c.change>=0?"+":""}${c.change}%</div></article>`).join("");document.querySelectorAll(".coin").forEach(e=>e.onclick=()=>select(coins.find(c=>c.id===e.dataset.id)))}
-function select(c){selected=c;$("#coinName").innerHTML=`${c.name} <span style="color:#46caff;font-size:11px">${c.ticker}</span>`;$("#coinPrice").textContent="$"+c.price.toLocaleString();renderSlots()}
-function renderSlots(){let n=used[selected.id]||0;$("#slots").innerHTML=[0,1,2,3,4].map(i=>`<i class="slot ${i<n?"on":""}"></i>`).join("")}
-function updatePayout(){let a=+$("#amount").value||0,r=10;$("#payout").textContent=money(a*(1+r/100))}
-function renderHistory(){let html=trades.slice(0,30).map(t=>`<div class="row"><div><b>${t.coin.name}</b><br><span class="muted">₹${t.amount.toLocaleString("en-IN")} · ${t.rate}% · 30s</span></div><div>${t.status}</div><div class="green">${t.status==="Won"?"+"+money(t.profit):"—"}</div></div>`).join("")||'<div class="empty">No trades yet.</div>';$("#homeHistory").innerHTML=html;$("#allHistory").innerHTML=html}
-function showView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$("#"+id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.view===id));scrollTo({top:0,behavior:"smooth"})}
-document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>showView(n.dataset.view));
-$("#search").oninput=renderCoins;$("#amount").oninput=updatePayout;
-$("#start").onclick=()=>{
- let amount=+$("#amount").value,rate=10,n=used[selected.id]||0;
- if(amount<10)return alert("Minimum amount is ₹10.");if(n>=5)return alert("Maximum 5 open slots for this coin.");if(amount>balance)return alert("Insufficient balance.");
- balance-=amount;used[selected.id]=n+1;updateBalances();renderSlots();
- let t={coin:selected,amount,rate,status:"Running",profit:0};trades.unshift(t);renderHistory();
- let left=30;$("#start").disabled=true;$("#start").textContent="Trade Running · 30s";
- const timer=setInterval(()=>{left--;$("#start").textContent=`Trade Running · ${left}s`;if(left<=0){clearInterval(timer);let profit=amount*rate/100;t.status="Won";t.profit=profit;balance+=amount+profit;pnl+=profit;used[selected.id]--;updateBalances();renderSlots();renderHistory();$("#start").disabled=false;$("#start").textContent="Start Trade · 30s";$("#winAmount").textContent="+"+money(profit);$("#winMeta").textContent=`${selected.name} · ${rate}% return · 30 seconds`;$("#winModal").classList.add("show")}},1000)
-};
-function closeWin(){$("#winModal").classList.remove("show")}
-function walletAction(type){alert(type==="deposit"?"Deposit flow placeholder — connect your approved payment provider/backend here.":"Withdrawal flow placeholder — connect your approved payout provider/backend here.")}
-function copyCode(){navigator.clipboard?.writeText("CX7K2P9");alert("Referral code copied.")}
-renderCoins();select(selected);updatePayout();updateBalances();
+
+const STORAGE_KEY = "cryptox_state_v5";
+const START_BALANCE = 10000;
+const FIXED_RATE = 10;
+const DURATION_MS = 30000;
+
+let state = loadState();
+let selectedId = state.selectedId || "btc";
+let tickTimer = null;
+let activeModalTrade = null;
+
+const $ = s => document.querySelector(s);
+const money = n => "₹" + Number(n || 0).toLocaleString("en-IN", {
+  minimumFractionDigits:2, maximumFractionDigits:2
+});
+const coin = () => COINS.find(c => c.id === selectedId) || COINS[0];
+
+function loadState(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if(saved && typeof saved.balance === "number"){
+      saved.trades = Array.isArray(saved.trades) ? saved.trades : [];
+      saved.slots = saved.slots || {};
+      saved.balance = Number(saved.balance);
+      saved.pnl = Number(saved.pnl || 0);
+      return saved;
+    }
+  }catch(e){}
+  return {balance:START_BALANCE,pnl:0,slots:{},trades:[],selectedId:"btc"};
+}
+
+function saveState(){
+  state.selectedId = selectedId;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function updateBalances(){
+  $("#balance").textContent = money(state.balance);
+  $("#walletBalance").textContent = money(state.balance);
+  $("#topBalance").textContent = money(state.balance);
+  $("#available").textContent = money(state.balance);
+  $("#pnl").textContent = money(state.pnl);
+  $("#walletProfit").textContent = money(state.pnl);
+}
+
+function renderCoins(){
+  const q = ($("#search")?.value || "").trim().toLowerCase();
+  const list = COINS.filter(c => (c.name+" "+c.ticker).toLowerCase().includes(q));
+  $("#coins").innerHTML = list.map(c => `
+    <article class="coin" data-id="${c.id}">
+      <div class="coinTop">
+        <div class="icon">${c.icon}</div>
+        <div class="tag">30 SEC</div>
+      </div>
+      <div class="coinName">${c.name}</div>
+      <div class="ticker">${c.ticker}</div>
+      <div class="coinPrice">$${Number(c.price).toLocaleString()}</div>
+      <div class="change ${c.change >= 0 ? "green" : ""}">
+        ${c.change >= 0 ? "+" : ""}${c.change}%
+      </div>
+    </article>
+  `).join("");
+
+  document.querySelectorAll(".coin").forEach(el => {
+    el.addEventListener("click", () => selectCoin(el.dataset.id));
+  });
+}
+
+function selectCoin(id){
+  selectedId = id;
+  const c = coin();
+  $("#coinName").innerHTML = `${c.name} <span style="color:#46caff;font-size:11px">${c.ticker}</span>`;
+  $("#coinPrice").textContent = "$" + Number(c.price).toLocaleString();
+  renderSlots();
+  saveState();
+}
+
+function renderSlots(){
+  const used = Number(state.slots[selectedId] || 0);
+  $("#slots").innerHTML = [0,1,2,3,4].map(i =>
+    `<i class="slot ${i < used ? "on" : ""}"></i>`
+  ).join("");
+}
+
+function updatePayout(){
+  const amount = Math.max(0, Number($("#amount").value) || 0);
+  $("#payout").textContent = money(amount * 1.10);
+}
+
+function renderHistory(){
+  const html = state.trades.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,50).map(t => {
+    const c = COINS.find(x => x.id === t.coinId) || COINS[0];
+    let status = t.status;
+    let right = status === "Won" ? `<span class="green">+${money(t.profit)}</span>` :
+                status === "Running" ? `<span class="muted" data-countdown="${t.id}">30s</span>` :
+                `<span class="muted">${status}</span>`;
+    return `
+      <div class="row" data-history="${t.id}">
+        <div>
+          <b>${c.name}</b><br>
+          <span class="muted">₹${Number(t.amount).toLocaleString("en-IN")} · 10% · 30s</span>
+        </div>
+        <div>${status}</div>
+        <div>${right}</div>
+      </div>`;
+  }).join("") || '<div class="empty">No trades yet.</div>';
+
+  $("#homeHistory").innerHTML = html;
+  $("#allHistory").innerHTML = html;
+}
+
+function renderActiveCountdowns(){
+  const now = Date.now();
+  state.trades.filter(t => t.status === "Running").forEach(t => {
+    const left = Math.max(0, t.endsAt - now);
+    const nodes = document.querySelectorAll(`[data-countdown="${t.id}"]`);
+    nodes.forEach(n => n.textContent = Math.ceil(left/1000) + "s");
+  });
+}
+
+function finishTrade(t){
+  if(t.status !== "Running") return;
+
+  const profit = Number(t.amount) * FIXED_RATE / 100;
+  t.status = "Won";
+  t.profit = profit;
+  t.payout = Number(t.amount) + profit;
+  t.finishedAt = Date.now();
+
+  state.balance += t.payout;
+  state.pnl += profit;
+  state.slots[t.coinId] = Math.max(0, Number(state.slots[t.coinId] || 0) - 1);
+
+  saveState();
+  updateBalances();
+  renderSlots();
+  renderHistory();
+
+  showWin(t);
+}
+
+function showWin(t){
+  activeModalTrade = t;
+  const c = COINS.find(x => x.id === t.coinId) || COINS[0];
+  $("#winAmount").textContent = "+" + money(t.profit);
+  $("#winMeta").textContent = `${c.name} · 10% return · 30 seconds`;
+  $("#winModal").classList.add("show");
+}
+
+function closeWin(){
+  $("#winModal").classList.remove("show");
+  activeModalTrade = null;
+}
+
+window.closeWin = closeWin;
+
+function processExpiredTrades(){
+  const now = Date.now();
+  state.trades
+    .filter(t => t.status === "Running" && t.endsAt <= now)
+    .forEach(finishTrade);
+}
+
+function startCountdownLoop(){
+  clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    processExpiredTrades();
+    renderActiveCountdowns();
+  }, 250);
+}
+
+function startTrade(){
+  const amount = Number($("#amount").value);
+  const used = Number(state.slots[selectedId] || 0);
+
+  if(!Number.isFinite(amount) || amount < 10){
+    alert("Minimum trade amount is ₹10.");
+    return;
+  }
+  if(used >= 5){
+    alert("Maximum 5 active trades are allowed for this coin.");
+    return;
+  }
+  if(amount > state.balance){
+    alert("Insufficient available balance.");
+    return;
+  }
+
+  const t = {
+    id: "T" + Date.now() + Math.random().toString(36).slice(2,7),
+    coinId: selectedId,
+    amount,
+    rate: FIXED_RATE,
+    createdAt: Date.now(),
+    endsAt: Date.now() + DURATION_MS,
+    status: "Running",
+    profit: 0,
+    payout: 0
+  };
+
+  state.balance -= amount;
+  state.slots[selectedId] = used + 1;
+  state.trades.push(t);
+
+  saveState();
+  updateBalances();
+  renderSlots();
+  renderHistory();
+  renderActiveCountdowns();
+}
+
+function walletAction(type){
+  alert(type === "deposit"
+    ? "Deposit UI is ready for backend/payment integration."
+    : "Withdraw UI is ready for backend/payout integration.");
+}
+
+window.walletAction = walletAction;
+
+function copyCode(){
+  navigator.clipboard?.writeText("CX7K2P9");
+  alert("Referral code copied.");
+}
+window.copyCode = copyCode;
+
+function showView(id){
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const target = document.getElementById(id);
+  if(target) target.classList.add("active");
+  document.querySelectorAll(".nav").forEach(n =>
+    n.classList.toggle("active", n.dataset.view === id)
+  );
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll(".nav").forEach(n =>
+  n.addEventListener("click", () => showView(n.dataset.view))
+);
+
+$("#search").addEventListener("input", renderCoins);
+$("#amount").addEventListener("input", updatePayout);
+$("#start").addEventListener("click", startTrade);
+
+renderCoins();
+selectCoin(selectedId);
+updatePayout();
+updateBalances();
+renderHistory();
+processExpiredTrades();
+renderActiveCountdowns();
+startCountdownLoop();
+
 </script>
+
+<div class="modal" id="walletModal">
+  <div class="winBox" style="text-align:left">
+    <div class="label">WALLET</div>
+    <h2 id="walletModalTitle" style="margin:8px 0 15px">Wallet</h2>
+    <div id="walletModalBody"></div>
+    <button class="close" onclick="closeWalletModal()">Cancel</button>
+  </div>
+</div>
+
 </body>
-                                                       </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </html>
